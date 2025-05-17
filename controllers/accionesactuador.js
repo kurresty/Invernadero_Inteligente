@@ -1,54 +1,64 @@
 const AccionActuador = require('../models/accionesactuador');
 
-
 const getAllAcciones = async (req, res) => {
     try {
-        const acciones = await Accion.getAll();
+        const acciones = await AccionActuador.getAll();
         res.json(acciones);
     } catch (err) {
-        res.status(500).send(err.message);
+        res.status(500).json({ error: err.message });
     }
 };
 
 const getAccionById = async (req, res) => {
     try {
-        const accion = await Accion.getById(req.params.id);
+        const accion = await AccionActuador.getById(req.params.id);
         if (!accion) {
             return res.status(404).json({ message: 'Acción no encontrada' });
         }
         res.json(accion);
     } catch (err) {
-        res.status(500).send(err.message);
+        res.status(500).json({ error: err.message });
     }
 };
 
 const createAccion = async (req, res) => {
-    const { id_actuador, estado, duracion_seg, fecha_hora } = req.body;
     try {
-        const nuevaAccion = await Accion.create(id_actuador, estado, duracion_seg, fecha_hora);
+        // Adaptado al nuevo método create que recibe un objeto
+        const nuevaAccion = await AccionActuador.create(req.body);
         res.status(201).json(nuevaAccion);
     } catch (err) {
-        res.status(500).send(err.message);
+        res.status(400).json({ 
+            error: 'Error al crear acción',
+            details: err.message 
+        });
     }
 };
 
 const updateAccion = async (req, res) => {
-    const { id_actuador, estado, duracion_seg, fecha_hora } = req.body;
-    const id_accion = req.params.id;
     try {
-        const accionActualizada = await Accion.update(id_accion, id_actuador, estado, duracion_seg, fecha_hora);
+        // Adaptado al nuevo método update que recibe id y objeto
+        const accionActualizada = await AccionActuador.update(
+            req.params.id,
+            req.body
+        );
         res.json(accionActualizada);
     } catch (err) {
-        res.status(500).send(err.message);
+        res.status(400).json({ 
+            error: 'Error al actualizar acción',
+            details: err.message 
+        });
     }
 };
 
 const deleteAccion = async (req, res) => {
     try {
-        await Accion.delete(req.params.id);
+        await AccionActuador.delete(req.params.id);
         res.json({ message: 'Acción eliminada correctamente' });
     } catch (err) {
-        res.status(500).send(err.message);
+        res.status(400).json({ 
+            error: 'Error al eliminar acción',
+            details: err.message 
+        });
     }
 };
 
