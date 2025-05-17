@@ -1,7 +1,4 @@
-
-
 const db = require('../config/mysql');
-
 
 const getAll = async () => {
     const [rows] = await db.query('SELECT * FROM sensores');
@@ -10,27 +7,33 @@ const getAll = async () => {
 
 const getById = async (id) => {
     const [rows] = await db.query('SELECT * FROM sensores WHERE id_sensor = ?', [id]);
-    return rows[0];
+    return rows[0] || null;
 };
 
-const create = async (tipo, descripcion, unidad, ubicacion) => {
+const create = async (tipo, descripcion, ubicacion) => {
     const [result] = await db.query(
-        'INSERT INTO sensores (tipo, descripcion, unidad, ubicacion) VALUES (?, ?, ?, ?)',
-        [tipo, descripcion, unidad, ubicacion]
+        'INSERT INTO sensores (tipo, descripcion, ubicacion) VALUES (?, ?, ?)',
+        [tipo, descripcion, ubicacion]
     );
-    return { id_sensor: result.insertId, tipo, descripcion, unidad, ubicacion };
+    return {
+        id_sensor: result.insertId,
+        tipo,
+        descripcion,
+        ubicacion
+    };
 };
 
-const update = async (id_sensor, tipo, descripcion, unidad, ubicacion) => {
+const update = async (id, tipo, descripcion, ubicacion) => {
     await db.query(
-        'UPDATE sensores SET tipo = ?, descripcion = ?, unidad = ?, ubicacion = ? WHERE id_sensor = ?',
-        [tipo, descripcion, unidad, ubicacion, id_sensor]
+        'UPDATE sensores SET tipo = ?, descripcion = ?, ubicacion = ? WHERE id_sensor = ?',
+        [tipo, descripcion, ubicacion, id]
     );
-    return { id_sensor, tipo, descripcion, unidad, ubicacion };
+    return getById(id);
 };
 
-const deleteSensor = async (id_sensor) => {
-    await db.query('DELETE FROM sensores WHERE id_sensor = ?', [id_sensor]);
+const deleteSensor = async (id) => {
+    const [result] = await db.query('DELETE FROM sensores WHERE id_sensor = ?', [id]);
+    return { affectedRows: result.affectedRows };
 };
 
 module.exports = {

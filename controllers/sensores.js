@@ -22,9 +22,9 @@ const getSensorById = async (req, res) => {
 };
 
 const createSensor = async (req, res) => {
-    const { tipo, descripcion, unidad, ubicacion } = req.body;
+    const { tipo, descripcion, ubicacion } = req.body;
     try {
-        const nuevoSensor = await sensorModel.create(tipo, descripcion, unidad, ubicacion);
+        const nuevoSensor = await sensorModel.create(tipo, descripcion, ubicacion);
         res.status(201).json(nuevoSensor);
     } catch (err) {
         res.status(500).send(err.message);
@@ -32,9 +32,9 @@ const createSensor = async (req, res) => {
 };
 
 const updateSensor = async (req, res) => {
-    const { tipo, descripcion, unidad, ubicacion } = req.body;
+    const { tipo, descripcion, ubicacion } = req.body;
     try {
-        const sensorActualizado = await sensorModel.update(req.params.id, tipo, descripcion, unidad, ubicacion);
+        const sensorActualizado = await sensorModel.update(req.params.id, tipo, descripcion, ubicacion);
         res.json(sensorActualizado);
     } catch (err) {
         res.status(500).send(err.message);
