@@ -1,12 +1,12 @@
 const db = require('../config/mysql');
 
 const getAll = async () => {
-    const [rows] = await pool.query('SELECT * FROM configuracion');
+    const [rows] = await db.query('SELECT * FROM configuracion');
     return rows;
 };
 
 const getById = async (id) => {
-    const [rows] = await pool.query('SELECT * FROM configuracion WHERE id_configuracion = ?', [id]);
+    const [rows] = await db.query('SELECT * FROM configuracion WHERE id_configuracion = ?', [id]);
     return rows[0];
 };
 
@@ -20,7 +20,7 @@ const create = async (
     accion_a_realizar,
     estado
 ) => {
-    const [result] = await pool.query(
+    const [result] = await db.query(
         `INSERT INTO configuracion (
             id_usuario,
             id_actuador,
@@ -43,7 +43,7 @@ const create = async (
         ]
     );
 
-    return { id_configuracion: result.insertId, ...arguments[0] };
+    return { id_configuracion: result.insertId, id_usuario, id_actuador, id_sensor, nombre_configuracion, descripcion, condicion_activacion, accion_a_realizar, estado };
 };
 
 const update = async (
@@ -57,7 +57,7 @@ const update = async (
     accion_a_realizar,
     estado
 ) => {
-    await pool.query(
+    await db.query(
         `UPDATE configuracion SET
             id_usuario = ?,
             id_actuador = ?,
@@ -85,7 +85,7 @@ const update = async (
 };
 
 const deleteConfiguracion = async (id) => {
-    await pool.query('DELETE FROM configuracion WHERE id_configuracion = ?', [id]);
+    await db.query('DELETE FROM configuracion WHERE id_configuracion = ?', [id]);
 };
 
 module.exports = {
