@@ -1,4 +1,6 @@
 const Usuario = require('../models/usuario');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const getAllUsuarios = async (req, res) => {
     try {
@@ -22,9 +24,11 @@ const getUsuarioById = async (req, res) => {
 };
 
 const createUsuario = async (req, res) => {
-    const { correo, password, nombre, apellido, rol, activo, fecha_registro, ultimo_login } = req.body;
+    const { correo, password, nombre, apellido, rol, activo } = req.body;
     try {
-        const nuevoUsuario = await Usuario.create(correo, password, nombre, apellido, rol, activo, fecha_registro, ultimo_login);
+       
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const nuevoUsuario = await Usuario.create(correo, hashedPassword, nombre, apellido, rol, activo);
         res.status(201).json(nuevoUsuario);
     } catch (err) {
         res.status(500).send(err.message);
@@ -51,10 +55,53 @@ const deleteUsuario = async (req, res) => {
     }
 };
 
+
+const loginUsuario = async (req, res) => {
+    const { correo, password } = req.body;
+
+    try {
+        const usuario = await Usuario.getByCorreo(correo);
+
+        if (!usuario) {
+            return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
+        }
+
+        const match = await bcrypt.compare(password, usuario.password);
+        if (!match) {
+            return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
+        }
+
+        // Actualiza el último login
+        await Usuario.updateUltimoLogin(usuario.id_usuario);
+
+        // Genera un token (opcional, para autenticación con JWT)
+        const token = jwt.sign(
+            { id: usuario.id_usuario, rol: usuario.rol },
+            'secreto_super_seguro', // 🔐 cámbialo por un secreto más seguro en producción
+            { expiresIn: '2h' }
+        );
+
+        res.json({
+            message: 'Login exitoso',
+            token,
+            usuario: {
+                id: usuario.id_usuario,
+                correo: usuario.correo,
+                rol: usuario.rol,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido
+            }
+        });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+};
+
 module.exports = {
     getAllUsuarios,
     getUsuarioById,
     createUsuario,
     updateUsuario,
-    deleteUsuario
+    deleteUsuario,
+    loginUsuario 
 };
