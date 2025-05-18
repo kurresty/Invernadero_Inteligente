@@ -71,13 +71,12 @@ const loginUsuario = async (req, res) => {
             return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
         }
 
-        // Actualiza el último login
         await Usuario.updateUltimoLogin(usuario.id_usuario);
 
-        // Genera un token (opcional, para autenticación con JWT)
+       
         const token = jwt.sign(
             { id: usuario.id_usuario, rol: usuario.rol },
-            'secreto_super_seguro', // 🔐 cámbialo por un secreto más seguro en producción
+            'secreto_super_seguro', 
             { expiresIn: '2h' }
         );
 
