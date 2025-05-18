@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const alertasController = require('../controllers/alertas');
 
+
 router.get('/', alertasController.getAllAlertas);
 router.get('/:id', alertasController.getAlertaById);
 router.post('/', alertasController.createAlerta);

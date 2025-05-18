@@ -23,7 +23,6 @@ const update = async (id_alerta, id_sensor, mensaje, nivel) => {
         'UPDATE alertas SET id_sensor = ?, mensaje = ?, nivel = ? WHERE id_alerta = ?',
         [id_sensor, mensaje, nivel, id_alerta]
     );
-    // Traemos el registro actualizado
     return getById(id_alerta);
 };
 
